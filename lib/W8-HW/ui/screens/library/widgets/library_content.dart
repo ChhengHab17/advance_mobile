@@ -16,7 +16,7 @@ class LibraryContent extends StatelessWidget {
     }
 
     if (mv.songs.error != null) {
-      return Center(child: Text("Error: ${mv.songs.error}"));
+      return Center(child: Text("Error: ${mv.songs.error}", style: TextStyle(color: Colors.red),));
     }
     final songs = mv.songs.data!;
 
