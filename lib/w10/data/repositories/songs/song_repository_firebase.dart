@@ -7,10 +7,10 @@ import '../../dtos/song_dto.dart';
 import 'song_repository.dart';
 
 class SongRepositoryFirebase extends SongRepository {
-  final Uri songsUri = Uri.https(
-    'test-a2a77-default-rtdb.asia-southeast1.firebasedatabase.app',
-    '/songs.json',
+  static final Uri baseUri = Uri.https(
+    'testing-99012-default-rtdb.asia-southeast1.firebasedatabase.app',
   );
+  final Uri songsUri = baseUri.replace(path: '/songs.json');
 
   @override
   Future<List<Song>> fetchSongs() async {
@@ -25,6 +25,37 @@ class SongRepositoryFirebase extends SongRepository {
         result.add(SongDto.fromJson(entry.key, entry.value));
       }
       return result;
+    } else {
+      // 2- Throw expcetion if any issue
+      throw Exception('Failed to load posts');
+    }
+  }
+
+  @override
+  Future<void> likeSong(String songId) async {
+    final http.Response response = await http.get(songsUri);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> songJson = json.decode(response.body);
+      for (final song in songJson.entries) {
+        if (song.key == songId) {
+          final currLike = song.value['likes'];
+          final Uri patchSongsUri = baseUri.replace(
+            path: '/songs/$songId.json',
+          );
+
+          final patchRes = await http.patch(
+            patchSongsUri,
+            body: jsonEncode({'likes': currLike + 1}),
+          );
+
+          if (patchRes.statusCode != 200) {
+            throw Exception('Failed like song');
+          }
+          return;
+        }
+      }
+      throw Exception("Song not found");
     } else {
       // 2- Throw expcetion if any issue
       throw Exception('Failed to load posts');
