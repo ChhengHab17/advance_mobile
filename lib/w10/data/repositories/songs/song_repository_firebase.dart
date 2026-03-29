@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:advance_flutter/w10/config/uri_config.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../model/songs/song.dart';
@@ -7,10 +8,8 @@ import '../../dtos/song_dto.dart';
 import 'song_repository.dart';
 
 class SongRepositoryFirebase extends SongRepository {
-  static final Uri baseUri = Uri.https(
-    'testing-99012-default-rtdb.asia-southeast1.firebasedatabase.app',
-  );
-  final Uri songsUri = baseUri.replace(path: '/songs.json');
+
+  final Uri songsUri = Uriconfig.baseUri.replace(path: '/songs.json');
   List<Song>? _cachedSongs;
 
   @override
@@ -46,7 +45,7 @@ class SongRepositoryFirebase extends SongRepository {
       for (final song in songJson.entries) {
         if (song.key == songId) {
           final currLike = song.value['likes'];
-          final Uri patchSongsUri = baseUri.replace(
+          final Uri patchSongsUri = Uriconfig.baseUri.replace(
             path: '/songs/$songId.json',
           );
 

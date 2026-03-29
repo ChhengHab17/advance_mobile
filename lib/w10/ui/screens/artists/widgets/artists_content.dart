@@ -1,6 +1,9 @@
+import 'package:advance_flutter/w10/data/repositories/artist/artist_repository.dart';
+import 'package:advance_flutter/w10/ui/screens/artist/view_model/artist_view_model.dart';
+import 'package:advance_flutter/w10/ui/screens/artist/widget/artist_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
- 
+
 import '../../../../model/artist/artist.dart';
 import '../../../theme/theme.dart';
 import '../../../utils/async_value.dart';
@@ -36,7 +39,23 @@ class ArtistsContent extends StatelessWidget {
           onRefresh: () => mv.refreshArtists(),
           child: ListView.builder(
             itemCount: artists.length,
-            itemBuilder: (context, index) => ArtistTile(artist: artists[index]),
+            itemBuilder: (context, index) => ArtistTile(
+              artist: artists[index],
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChangeNotifierProvider(
+                      create: (_) => ArtistViewModel(
+                        artistRepository: context.read<ArtistRepository>(),
+                        artist: artists[index],
+                      ),
+                      child: ArtistContent(),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         );
     }
@@ -51,7 +70,10 @@ class ArtistsContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Artist", style: AppTextStyles.heading),
-              IconButton(onPressed: mv.refreshArtists, icon: Icon(Icons.refresh))
+              IconButton(
+                onPressed: mv.refreshArtists,
+                icon: Icon(Icons.refresh),
+              ),
             ],
           ),
           SizedBox(height: 50),
